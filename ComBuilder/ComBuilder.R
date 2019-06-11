@@ -79,7 +79,7 @@ ComBuilder <- function(area,community,rank,loci,setmax = 100, add_list = F, wiki
       #making a data frame with all taxonomy levels
       taxon.ranks <- data.frame(V1 = c("Kingdom","Phylum","Class","Order","Family","Genus","Species"), V2=NA)
       
-      #!# not sure what this does yet, need to go line by line
+      #!# double check this section
       k<-1
       for(k in 1:nrow(taxon.ranks)){
         if(length(as.character(sn[sn$V1 == taxon.ranks$V1[k],2]))==1){
@@ -178,7 +178,6 @@ ComBuilder <- function(area,community,rank,loci,setmax = 100, add_list = F, wiki
     }
   }
   
-  #!# need to combine gbif taxonomy file with NCBI counts
   write.table(x = df,file = "Output/community.summary.txt",append = F,quote = F,sep = "\t",row.names = F,col.names = T)
   
 }
