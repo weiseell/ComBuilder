@@ -1,4 +1,4 @@
-ComBuilder <- function(area,community,rank,loci,setmax = 100, add_list = F, wiki_search = T,group = T, acc_only = F, summ_only = F){
+ComBuilder <- function(area,community,rank,loci,setmax = 100, add_list = F, wiki_check = T,group = T, acc_only = F, summ_only = F){
   #load dependancies
   require(rgdal)
   require(rgbif)
@@ -10,7 +10,8 @@ ComBuilder <- function(area,community,rank,loci,setmax = 100, add_list = F, wiki
   key = name_backbone(name = community)$usageKey
   
   #make a grid to put over area to cut the size into queryable by gbif
-  startgrid = st_make_grid(spobj, n = c(10,10))   #Can adjust the dimensions of the grid -- this makes a 10 x 10 grid, probably unnecessary to have this many cells
+  spobj <- area
+  startgrid = st_make_grid(spobj, n = c(5,5))   #Can adjust the dimensions of the grid -- this makes a 10 x 10 grid, probably unnecessary to have this many cells
   spgrid = as_Spatial(startgrid)
   
   #overlay grid over area
@@ -29,13 +30,14 @@ ComBuilder <- function(area,community,rank,loci,setmax = 100, add_list = F, wiki
   occ = NULL
   i <- NULL
   print("Collecting gbif occurance data")
+  i <- 1
   for(i in (1:length(outgrid))){
     #search for occurances in gbif
     res = occ_search(taxonKey = key, geometry = mygrid[i], hasCoordinate = TRUE, limit = 200000)
     #grab taxonomy info for the occurances and save into a bigger list
     data <- as.data.frame(res$data)
     #select taxonomy
-    data <- data %>% select(kingdom,phylum,order,family,genus,species,name,collectionCode,basisOfRecord)
+    data <- data %>% select(kingdom,phylum,order,family,genus,species,name,basisOfRecord)
     #getting rid of data that isn't contemporary data (historical data not accurate to the current community)
     data <- subset(data,data$basisOfRecord != "PRESERVED_SPECIMEN")
     data <- subset(data,data$basisOfRecord != "UNKNOWN")
@@ -45,7 +47,7 @@ ComBuilder <- function(area,community,rank,loci,setmax = 100, add_list = F, wiki
   print("Done collecting gbif occurance data")
   #condense occurance data to a unique species list
   df <- occ %>% distinct()
-  out1 <- df %>% mutate(sci.name = paste(Genus,Species,sep = " "))
+  out1 <- df %>% mutate(sci.name = species)
   
   #wikipedia taxonomy check
   if(wiki_check == "T"){
@@ -62,7 +64,7 @@ ComBuilder <- function(area,community,rank,loci,setmax = 100, add_list = F, wiki
     output <- NULL
     for(j in 1:nrow(df)){
       #print j to keep track of where the loop is for troubleshooting
-      print(j)
+      #print(j)
       #reading in the data from the html webpage
       wp <- readLines(paste0('http://en.wikipedia.org/wiki/Special:Search/',df$species[j]))
       #getting lines of hmtl code that has both scientific and common names in them and 
@@ -119,12 +121,14 @@ ComBuilder <- function(area,community,rank,loci,setmax = 100, add_list = F, wiki
   species_list$count <- 0
   
   #loop to get accession numbers and NCBI sequences for each species
+  print("Starting to look for NCBI sequences")
   i <- NULL
+  i <- 7
   for(i in 1:nrow(df)){
-    print(i)
+    #print(i)
     
     #creating the search term for NCBI for each sci.name
-    my.term <- paste0("(",species_list$sci.name[i],"[Organism]) AND",loci,"[Title]")
+    my.term <- paste0("(",species_list$sci.name[i],"[Organism]) AND ",loci,"[Title]")
     my.term
     
     #doing the serach
@@ -135,7 +139,7 @@ ComBuilder <- function(area,community,rank,loci,setmax = 100, add_list = F, wiki
     length(x$ids)
     
     #counting the IDS
-    species_list$locus.count[i] <- length(x$ids)
+    species_list$count[i] <- length(x$ids)
     x$ids
     
     if(acc_only == F){
@@ -150,7 +154,7 @@ ComBuilder <- function(area,community,rank,loci,setmax = 100, add_list = F, wiki
         
         my.fetch <- gsub(pattern = "$\n",replacement = "",x = my.fetch)
         #putting the sequences for the species into the seq folder 
-        write.table(my.fetch, file = paste0("Output/seqs/",df$sci.name[i],"_",loci,".fasta"), quote = F, row.names = F, col.names = F)
+        write.table(my.fetch, file = paste0("Output/seqs/",species_list$sci.name[i],"_",loci,".fasta"), quote = F, row.names = F, col.names = F)
       }
     }
     if(acc_only == T){
@@ -172,12 +176,12 @@ ComBuilder <- function(area,community,rank,loci,setmax = 100, add_list = F, wiki
     #loop to condense all fasta files into one file
     i = 1
     for(i in 1:length(my.file)) {
-      print(i)
+      #print(i)
       temp <- readLines(paste0("Output/seqs/", my.file[i]))
       cat(temp,file = paste0("Output/allseqs.fasta"),sep = "\n",append = TRUE)
     }
   }
   
-  write.table(x = df,file = "Output/community.summary.txt",append = F,quote = F,sep = "\t",row.names = F,col.names = T)
+  write.table(x = species_list,file = "Output/community.summary.txt",append = F,quote = F,sep = "\t",row.names = F,col.names = T)
   
 }
