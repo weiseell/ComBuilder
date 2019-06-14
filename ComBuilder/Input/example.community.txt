@@ -1,0 +1,20 @@
+sample_number	sci.name
+1	Cambarus bartonii
+2	Cambarus carinirostris
+3	Cambarus diogenes
+4	Cambarus monongalensis
+5	Cambarus robustus
+6	Eriocheir sinensis
+7	Fallicambarus fodiens
+8	Faxonius limosus
+9	Homarus americanus
+10	Orconectes cristavarius
+11	Orconectes immunis
+12	Orconectes obscurus
+13	Orconectes propinquus
+14	Orconectes rusticus
+15	Orconectes virilis
+16	Palaemonetes kadiakensis
+17	Procambarus acutus
+18	Procambarus clarkii
+19	Procambarus gracilis
