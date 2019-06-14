@@ -1,6 +1,8 @@
 FindNCBI <- function(species_list,loci,setmax = 100, group = T, acc_only = F, summ_only = F){
   require(rentrez)
   
+  require(rentrez)
+  
   #make an output folder and a sequence folder to put all of the sequences in
   dir.create("Output/")
   dir.create("Output/seqs")
@@ -9,12 +11,14 @@ FindNCBI <- function(species_list,loci,setmax = 100, group = T, acc_only = F, su
   species_list$count <- 0
   
   #loop to get accession numbers and NCBI sequences for each species
+  print("Starting to look for NCBI sequences")
   i <- NULL
-  for(i in 1:nrow(df)){
-    print(i)
+  i <- 7
+  for(i in 1:nrow(species_list)){
+    #print(i)
     
     #creating the search term for NCBI for each sci.name
-    my.term <- paste0("(",species_list$sci.name[i],"[Organism]) AND",loci,"[Title]")
+    my.term <- paste0("(",species_list$sci.name[i],"[Organism]) AND ",loci,"[Title]")
     my.term
     
     #doing the serach
@@ -25,7 +29,7 @@ FindNCBI <- function(species_list,loci,setmax = 100, group = T, acc_only = F, su
     length(x$ids)
     
     #counting the IDS
-    species_list$locus.count[i] <- length(x$ids)
+    species_list$count[i] <- length(x$ids)
     x$ids
     
     if(acc_only == F){
@@ -40,7 +44,7 @@ FindNCBI <- function(species_list,loci,setmax = 100, group = T, acc_only = F, su
         
         my.fetch <- gsub(pattern = "$\n",replacement = "",x = my.fetch)
         #putting the sequences for the species into the seq folder 
-        write.table(my.fetch, file = paste0("Output/seqs/",df$sci.name[i],"_",loci,".fasta"), quote = F, row.names = F, col.names = F)
+        write.table(my.fetch, file = paste0("Output/seqs/",species_list$sci.name[i],"_",loci,".fasta"), quote = F, row.names = F, col.names = F)
       }
     }
     if(acc_only == T){
@@ -62,12 +66,11 @@ FindNCBI <- function(species_list,loci,setmax = 100, group = T, acc_only = F, su
     #loop to condense all fasta files into one file
     i = 1
     for(i in 1:length(my.file)) {
-      print(i)
-      df <- readLines(paste0("Output/seqs/", my.file[i]))
-      head(df)
-      cat(df,file = paste0("Output/allseqs.fasta"),sep = "\n",append = TRUE)
+      #print(i)
+      temp <- readLines(paste0("Output/seqs/", my.file[i]))
+      cat(temp,file = paste0("Output/allseqs.fasta"),sep = "\n",append = TRUE)
     }
   }
-  #write summary file
-  write.table(x = df,file = "Output/community.summary.txt",append = F,quote = F,sep = "\t",row.names = F,col.names = T)
+  
+  write.table(x = species_list,file = "Output/community.summary.txt",append = F,quote = F,sep = "\t",row.names = F,col.names = T)
 }
