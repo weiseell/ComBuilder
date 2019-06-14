@@ -5,7 +5,7 @@
 %%  ~~function to do ... ~~
 }
 \description{
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
+%%  ~~ A function that uses gbif occurance data to produce a species list for an area, then queries NCBI for sequences for that list. Takes inputs of a shapefile, taxonomy and a specific locus. ~~
 }
 \usage{
 ComBuilder(area,community,rank,loci,add_list = F, wiki_search = T,group = T, acc_only = F, summ_only = F)
@@ -15,11 +15,11 @@ ComBuilder(area,community,rank,loci,add_list = F, wiki_search = T,group = T, acc
   \item{area}{
 %%     an imported .sbh shape file for the area to be querid in gbif for occurance data
   \item{community}{
-%%     A taxonomic discription for the occurance data wanted from NCBI (examples include: Animalia, Chordata, )
+%%     A taxonomic discription for the occurance data wanted from NCBI (e.g. Animalia, Chordata, Decapoda)
   \item{rank}{
-%%     The taxonomic rank of the communitry discription
+%%     The taxonomic rank of the communitry discription (e.g. Kingdom, Phylum, etc.)
   \item{loci}{
-%%     Specify the loci that will be searched on NCBI
+%%     Specify the loci that will be searched on NCBI (e.g. COI, 16S, rbcL)
   \item{add_list}{
 %%     A specific list of species that needs to be added to the gbif occurance data before querying NCBI (e.g. an invasive species watchlist). If no list is required, keep as default F
   \item{wiki_search}{
@@ -35,7 +35,7 @@ ComBuilder(area,community,rank,loci,add_list = F, wiki_search = T,group = T, acc
 }
 }
 \details{
-%%  ~~ If necessary, more details than the description above ~~
+%%  ~~  ~~
 }
 \value{
 %%  ~Describe the value returned
@@ -48,7 +48,7 @@ ComBuilder(area,community,rank,loci,add_list = F, wiki_search = T,group = T, acc
 %% ~put references to the literature/web site here ~
 }
 \author{
-%%  ~~who you are~~
+%%  ~~Ellie Weise, Nick Sard~~
 }
 \note{
 %%  ~~further notes~~
